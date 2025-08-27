@@ -1,14 +1,37 @@
-<script>
+<script lang="ts">
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	
-	export let data;
+	interface Question {
+		id: string;
+		quizId: string;
+		questionText: string;
+		optionA: string;
+		optionB: string;
+		optionC: string;
+		optionD: string;
+		correctAnswer: string;
+	}
+	
+	interface Quiz {
+		id: string;
+		topic: string;
+		createdAt: string;
+		questions?: Question[];
+	}
+	
+	interface PageData {
+		quizzes: Quiz[];
+		searchQuery: string;
+	}
+	
+	export let data: PageData;
 
 	let searchValue = data.searchQuery || '';
 	let filteredQuizzes = data.quizzes || [];
 	
 	// Update URL without navigation when search changes
-	function updateURL(searchTerm) {
+	function updateURL(searchTerm: string) {
 		if (!browser) return;
 		
 		const url = new URL($page.url);
@@ -21,13 +44,13 @@
 	}
 	
 	// Filter quizzes on client side - search all content
-	function filterQuizzes(searchTerm, allQuizzes) {
+	function filterQuizzes(searchTerm: string, allQuizzes: Quiz[]): Quiz[] {
 		if (!searchTerm || !searchTerm.trim()) {
 			return allQuizzes;
 		}
 		
 		const term = searchTerm.toLowerCase();
-		return allQuizzes.filter(quiz => {
+		return allQuizzes.filter((quiz: Quiz) => {
 			// Search in quiz topic
 			if (quiz.topic.toLowerCase().includes(term)) {
 				return true;
@@ -35,7 +58,7 @@
 			
 			// Search in questions and answers
 			if (quiz.questions && quiz.questions.length > 0) {
-				return quiz.questions.some(question => 
+				return quiz.questions.some((question: Question) => 
 					question.questionText.toLowerCase().includes(term) ||
 					question.optionA.toLowerCase().includes(term) ||
 					question.optionB.toLowerCase().includes(term) ||
@@ -48,13 +71,14 @@
 		});
 	}
 	
-	function handleSearchInput(event) {
-		searchValue = event.target.value;
+	function handleSearchInput(event: Event) {
+		const target = event.target as HTMLInputElement;
+		searchValue = target.value;
 		updateURL(searchValue);
 		filteredQuizzes = filterQuizzes(searchValue, data.quizzes);
 	}
 
-	function formatDate(dateString) {
+	function formatDate(dateString: string) {
 		return new Date(dateString).toLocaleDateString('en-US', {
 			year: 'numeric',
 			month: 'short',

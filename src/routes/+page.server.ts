@@ -1,7 +1,7 @@
 import type { Actions } from "@sveltejs/kit";
 import { db } from "$lib/server/db";
 import { questions, quizzes } from "$lib/server/db/schema";
-import { desc, eq, like, or } from "drizzle-orm";
+import { desc, eq, or } from "drizzle-orm";
 
 export const load = async ({ url }: { url: URL }) => {
   const searchQuery = url.searchParams.get("search") || "";
@@ -19,7 +19,7 @@ export const load = async ({ url }: { url: URL }) => {
       .limit(50); // Increase limit for better search results
 
     // Get all questions for these quizzes
-    let allQuestions: any[] = [];
+    let allQuestions: typeof questions.$inferSelect[] = [];
     if (allQuizzes.length > 0) {
       const quizIds = allQuizzes.map((q) => q.id);
       allQuestions = await db

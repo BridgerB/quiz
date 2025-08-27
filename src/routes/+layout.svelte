@@ -22,8 +22,8 @@
 			<nav class="main-nav">
 				<a href="/" class="nav-link" class:active={currentPath === '/'}>Home</a>
 				<a href="/reports" class="nav-link" class:active={currentPath === '/reports'}>Reports</a>
-				<a href="/admin" class="nav-link" class:active={currentPath === '/admin'}>Admin</a>
-				<a href="/dev" class="nav-link" class:active={currentPath === '/dev'}>Dev</a>
+				<a href="/admin" class="nav-link" class:active={currentPath.startsWith('/admin')}>Admin</a>
+				<a href="/dev" class="nav-link" class:active={currentPath.startsWith('/dev')}>Dev</a>
 			</nav>
 		</div>
 	</header>

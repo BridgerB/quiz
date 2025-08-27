@@ -1,16 +1,15 @@
-<script>
-	import { enhance } from '$app/forms';
+<script lang="ts">
+	import type { PageData } from './$types';
 	
-	export let data;
-	export let form;
+	export let data: PageData;
 	
 	let currentQuestionIndex = 0;
-	let userAnswers = {};
+	let userAnswers: Record<string, string> = {};
 	$: currentQuestion = data.questions[currentQuestionIndex];
 	$: isLastQuestion = currentQuestionIndex === data.questions.length - 1;
 	$: totalQuestions = data.questions.length;
 	
-	function selectAnswer(questionId, answer) {
+	function selectAnswer(questionId: string, answer: string) {
 		userAnswers[questionId] = answer;
 		userAnswers = { ...userAnswers }; // Trigger reactivity
 	}
@@ -57,7 +56,7 @@
 									class="option-input"
 								/>
 								<span class="option-letter">{option}</span>
-								<span class="option-text">{currentQuestion[`option${option}`]}</span>
+								<span class="option-text">{(currentQuestion as any)[`option${option}`]}</span>
 							</label>
 						{/each}
 					</div>
@@ -274,178 +273,6 @@
 		cursor: not-allowed;
 	}
 
-	/* Results Styles */
-	.results-container {
-		text-align: center;
-	}
-
-	.results-header {
-		margin-bottom: 2rem;
-	}
-
-	.results-header h1 {
-		color: #333;
-		margin-bottom: 1rem;
-	}
-
-	.score-display {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 1rem;
-	}
-
-	.score-circle {
-		width: 100px;
-		height: 100px;
-		border-radius: 50%;
-		background: #28a745;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: white;
-		font-weight: bold;
-		font-size: 1.5rem;
-	}
-
-	.score-percentage {
-		font-size: 2rem;
-		font-weight: 600;
-		color: #333;
-	}
-
-	.results-summary {
-		text-align: left;
-		margin-bottom: 2rem;
-	}
-
-	.results-summary h2 {
-		color: #333;
-		margin-bottom: 1.5rem;
-		text-align: center;
-	}
-
-	.result-item {
-		background: white;
-		border: 1px solid #e1e5e9;
-		border-radius: 8px;
-		padding: 1.5rem;
-		margin-bottom: 1rem;
-		border-left: 4px solid #e1e5e9;
-	}
-
-	.result-item.correct {
-		border-left-color: #28a745;
-		background: #f8fff8;
-	}
-
-	.result-item.incorrect {
-		border-left-color: #dc3545;
-		background: #fff8f8;
-	}
-
-	.result-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 1rem;
-	}
-
-	.question-number {
-		font-weight: 600;
-		color: #666;
-	}
-
-	.result-badge {
-		padding: 0.25rem 0.75rem;
-		border-radius: 12px;
-		font-size: 0.85rem;
-		font-weight: 500;
-	}
-
-	.result-badge.correct {
-		background: #d4edda;
-		color: #155724;
-	}
-
-	.result-badge.incorrect {
-		background: #f8d7da;
-		color: #721c24;
-	}
-
-	.result-question {
-		color: #333;
-		margin-bottom: 1rem;
-		font-size: 1.1rem;
-	}
-
-	.result-answers {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.answer-row {
-		display: flex;
-		gap: 0.75rem;
-	}
-
-	.answer-label {
-		font-weight: 500;
-		color: #666;
-		min-width: 120px;
-	}
-
-	.answer-value {
-		color: #333;
-	}
-
-	.answer-value.correct {
-		color: #28a745;
-		font-weight: 500;
-	}
-
-	.answer-value.incorrect {
-		color: #dc3545;
-		font-weight: 500;
-	}
-
-	.results-actions {
-		display: flex;
-		gap: 1rem;
-		justify-content: center;
-	}
-
-	.action-btn {
-		padding: 0.75rem 1.5rem;
-		border: none;
-		border-radius: 8px;
-		font-size: 1rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s;
-		text-decoration: none;
-		display: inline-block;
-	}
-
-	.action-btn.primary {
-		background: #007bff;
-		color: white;
-	}
-
-	.action-btn.primary:hover {
-		background: #0056b3;
-	}
-
-	.action-btn.secondary {
-		background: #6c757d;
-		color: white;
-	}
-
-	.action-btn.secondary:hover {
-		background: #545b62;
-	}
-
 	@media (max-width: 768px) {
 		.container {
 			padding: 1rem;
@@ -457,19 +284,6 @@
 		}
 
 		.nav-btn {
-			width: 100%;
-			text-align: center;
-		}
-
-		.score-display {
-			flex-direction: column;
-		}
-
-		.results-actions {
-			flex-direction: column;
-		}
-
-		.action-btn {
 			width: 100%;
 			text-align: center;
 		}

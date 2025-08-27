@@ -97,7 +97,7 @@
             }
           },
           itemStyle: {
-            color: function(params: any) {
+            color: function(params: { dataIndex: number }) {
               const colors = ['#28a745', '#20c997', '#ffc107', '#fd7e14', '#dc3545', '#6f42c1'];
               return colors[params.dataIndex % colors.length];
             }
