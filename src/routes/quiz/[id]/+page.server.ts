@@ -39,7 +39,6 @@ export const load: PageServerLoad = async ({ params }) => {
       questions: quizQuestions,
     };
   } catch (error) {
-    console.error("Error loading quiz:", error);
     throw new Error("Failed to load quiz");
   }
 };
@@ -113,8 +112,6 @@ export const actions: Actions = {
         .returning();
 
       // Redirect to results page
-      console.log("🎉 Quiz submitted successfully! Redirecting to results...");
-      console.log("🔄 Redirecting to:", `/quiz/results/${attempt.id}`);
       throw redirect(303, `/quiz/results/${attempt.id}`);
     } catch (error) {
       // Check if this is actually a redirect (which is expected)
@@ -122,11 +119,8 @@ export const actions: Actions = {
         error && typeof error === "object" && "status" in error &&
         error.status === 303
       ) {
-        console.log("✅ Quiz submitted successfully! Redirecting...");
         throw error; // Re-throw redirect - this is the expected behavior
       }
-
-      console.error("Error submitting quiz:", error);
       return fail(500, {
         error: "Failed to submit quiz. Please try again.",
       });

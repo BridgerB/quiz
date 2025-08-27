@@ -4,7 +4,6 @@ import { quizAttempts, quizzes } from "$lib/server/db/schema";
 import { count, desc, eq, sql } from "drizzle-orm";
 
 export const load: PageServerLoad = async () => {
-  console.log("🔍 Loading reports data...");
   try {
     // Quiz creation trends over time
     const quizTrends = await db
