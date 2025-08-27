@@ -3,6 +3,92 @@ import { fail } from "@sveltejs/kit";
 import { db } from "$lib/server/db";
 import { questions, quizAttempts, quizzes } from "$lib/server/db/schema";
 import { count, desc, eq, sql } from "drizzle-orm";
+import JSZip from 'jszip';
+
+type DatabaseRecord = Record<string, any>;
+
+type BackupResult = {
+  zipBuffer: Buffer;
+  timestamp: string;
+};
+
+async function convertToCSV(data: DatabaseRecord[]): Promise<string> {
+  if (data.length === 0) return '';
+  const headers = Object.keys(data[0]);
+  const headerRow = headers.join(',');
+  const rows = data.map((row) => {
+    return headers
+      .map((header) => {
+        let value = row[header];
+        if (value === null || value === undefined) {
+          return '';
+        }
+        if (Array.isArray(value)) {
+          value = `"${value.join(';')}"`;
+        }
+        // Convert Date objects to ISO strings
+        if (value instanceof Date) {
+          value = value.toISOString();
+        }
+        if (typeof value === 'string') {
+          value = `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      })
+      .join(',');
+  });
+  return [headerRow, ...rows].join('\n');
+}
+
+async function backupDatabase(): Promise<BackupResult> {
+  try {
+    console.log('🚀 Starting database backup...\n');
+
+    const zip = new JSZip();
+
+    const now = new Date();
+    const localTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+    const timestamp = localTime.toISOString().replace(/:/g, '-').split('.')[0];
+
+    // Backup each table individually using schema objects
+    
+    // Backup quizzes table
+    console.log('Backing up quizzes...');
+    const quizzesData = await db.select().from(quizzes);
+    const quizzesCSV = await convertToCSV(quizzesData);
+    zip.file('quizzes.csv', quizzesCSV);
+    console.log(`✓ Backed up ${quizzesData.length} records from quizzes`);
+
+    // Backup questions table
+    console.log('Backing up questions...');
+    const questionsData = await db.select().from(questions);
+    const questionsCSV = await convertToCSV(questionsData);
+    zip.file('questions.csv', questionsCSV);
+    console.log(`✓ Backed up ${questionsData.length} records from questions`);
+
+    // Backup quiz_attempts table
+    console.log('Backing up quiz_attempts...');
+    const attemptsData = await db.select().from(quizAttempts);
+    const attemptsCSV = await convertToCSV(attemptsData);
+    zip.file('quiz_attempts.csv', attemptsCSV);
+    console.log(`✓ Backed up ${attemptsData.length} records from quiz_attempts`);
+
+    const zipBuffer = await zip.generateAsync({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+      compressionOptions: {
+        level: 9
+      }
+    });
+
+    console.log('\n✨ Database backup completed successfully!');
+    return { zipBuffer, timestamp };
+  } catch (error) {
+    console.error('\n❌ Database backup failed:', error);
+    console.error('Stack trace:', error instanceof Error ? error.stack : '');
+    throw error;
+  }
+}
 
 export const load: PageServerLoad = async () => {
   try {
@@ -94,6 +180,23 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
+  backup: async () => {
+    try {
+      const { zipBuffer, timestamp } = await backupDatabase();
+      const base64File = zipBuffer.toString('base64');
+
+      return {
+        success: true,
+        file: base64File,
+        filename: `quiz-backup-${timestamp}.zip`,
+        type: 'application/zip'
+      };
+    } catch (err) {
+      console.error('Backup failed:', err);
+      return fail(500, { error: 'Failed to create backup' });
+    }
+  },
+
   deleteQuiz: async ({ request }) => {
     const data = await request.formData();
     const quizId = data.get("quizId")?.toString();

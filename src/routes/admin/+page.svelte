@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import type { PageData } from './$types';
+  import type { ActionResult } from '@sveltejs/kit';
   
   export let data: PageData;
   export let form: any;
@@ -9,6 +10,8 @@
   let showBulkActions = false;
   let editingQuiz: string | null = null;
   let editTopic = '';
+  let isBackupLoading = false;
+  let backupError: string | null = null;
   
   $: showBulkActions = selectedQuizzes.length > 0;
   
@@ -64,6 +67,53 @@
   
   function confirmClearAttempts() {
     return confirm('Are you sure you want to clear ALL quiz attempts? This action cannot be undone!');
+  }
+  
+  function downloadBase64File(base64Data: string, filename: string, type: string) {
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type });
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+
+  function handleBackup() {
+    isBackupLoading = true;
+    backupError = null;
+
+    return async ({ result }: { result: ActionResult }) => {
+      isBackupLoading = false;
+
+      if (result.type === 'failure') {
+        backupError = 'Failed to create backup';
+        return;
+      }
+
+      if (result.type === 'success' && result.data) {
+        const data = result.data as {
+          success: boolean;
+          file: string;
+          filename: string;
+          type: string;
+        };
+        if (data.success) {
+          downloadBase64File(data.file, data.filename, data.type);
+        }
+      }
+    };
   }
 </script>
 
@@ -264,6 +314,32 @@
     </div>
   </div>
 
+  <!-- Database Backup -->
+  <div class="backup-section">
+    <h2>💾 Database Backup</h2>
+    <div class="backup-content">
+      <p class="backup-description">
+        Download a complete backup of all quiz data including quizzes, questions, and attempts as CSV files in a ZIP archive.
+      </p>
+      
+      <form method="POST" action="?/backup" use:enhance={handleBackup} class="backup-form">
+        <button type="submit" disabled={isBackupLoading} class="btn primary backup-button">
+          {#if isBackupLoading}
+            📦 Creating Backup...
+          {:else}
+            💾 Download Database Backup
+          {/if}
+        </button>
+      </form>
+
+      {#if backupError}
+        <div class="error-message">
+          ❌ Error: {backupError}
+        </div>
+      {/if}
+    </div>
+  </div>
+
   <!-- System Maintenance -->
   <div class="maintenance-section">
     <h2>⚠️ System Maintenance</h2>
@@ -328,7 +404,7 @@
     border: 1px solid #f5c6cb;
   }
 
-  .stats-section, .management-section, .activity-section, .performance-section, .maintenance-section {
+  .stats-section, .management-section, .activity-section, .performance-section, .backup-section, .maintenance-section {
     background: white;
     border-radius: 12px;
     padding: 2rem;
@@ -336,7 +412,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  .stats-section h2, .management-section h2, .activity-section h2, .performance-section h2, .maintenance-section h2 {
+  .stats-section h2, .management-section h2, .activity-section h2, .performance-section h2, .backup-section h2, .maintenance-section h2 {
     color: #333;
     margin-top: 0;
     margin-bottom: 1.5rem;
@@ -586,6 +662,38 @@
     margin-top: 1rem;
     color: #666;
     font-size: 0.9rem;
+  }
+
+  /* Backup Section */
+  .backup-content {
+    text-align: center;
+  }
+
+  .backup-description {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .backup-form {
+    margin-bottom: 1rem;
+  }
+
+  .backup-button {
+    min-width: 200px;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    border: 1px solid #f5c6cb;
   }
 
   .empty-state, .empty-activity, .empty-performance {
