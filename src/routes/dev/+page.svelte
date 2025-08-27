@@ -156,23 +156,9 @@
 
       <form method="POST" action="?/testOllama" use:enhance>
         <button type="submit" class="tool-btn secondary">
-          🤖 Test Ollama Connection
+          🤖 Test Anthropic Connection
         </button>
-        <p class="tool-desc">Verify Ollama API is working</p>
-      </form>
-
-      <form method="POST" action="?/clearCache" use:enhance>
-        <button type="submit" class="tool-btn warning">
-          🧹 Clear Cache
-        </button>
-        <p class="tool-desc">Clear application cache</p>
-      </form>
-
-      <form method="POST" action="?/runMigration" use:enhance>
-        <button type="submit" class="tool-btn danger">
-          🗄️ Run Migrations
-        </button>
-        <p class="tool-desc">Execute database migrations</p>
+        <p class="tool-desc">Verify Anthropic API is working</p>
       </form>
     </div>
   </div>

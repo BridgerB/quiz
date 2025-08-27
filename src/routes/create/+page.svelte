@@ -7,7 +7,7 @@
 <div class="container">
 	<div class="create-header">
 		<h1>Create New Quiz</h1>
-		<p class="subtitle">Generate an AI-powered quiz on any topic using Ollama</p>
+		<p class="subtitle">Generate an AI-powered quiz on any topic using Claude</p>
 	</div>
 
 	<div class="create-form-section">
@@ -72,7 +72,7 @@
 				<div class="step-number">2</div>
 				<div class="step-content">
 					<h4>AI Generation</h4>
-					<p>Ollama AI generates 5 educational multiple-choice questions</p>
+					<p>Claude AI generates 5 educational multiple-choice questions</p>
 				</div>
 			</div>
 			<div class="step">
@@ -87,7 +87,7 @@
 		<div class="tech-info">
 			<h4>Technical Details</h4>
 			<ul>
-				<li><strong>AI Model:</strong> Llama 3.1 via Ollama</li>
+				<li><strong>AI Model:</strong> Claude Sonnet 4 by Anthropic</li>
 				<li><strong>Format:</strong> 5 questions, 4 options each (A-D)</li>
 				<li><strong>Storage:</strong> Questions saved to database for review</li>
 				<li><strong>Accuracy:</strong> AI generates factual, educational content</li>
@@ -240,7 +240,6 @@
 		cursor: not-allowed;
 		transform: none;
 	}
-
 
 	.cancel-button {
 		color: #666;
