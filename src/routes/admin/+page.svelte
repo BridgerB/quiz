@@ -41,6 +41,18 @@
     editTopic = '';
   }
   
+  function handleEditSubmit() {
+    return async ({ result, update }) => {
+      if (result.type === 'success') {
+        // Reset edit mode on successful update
+        editingQuiz = null;
+        editTopic = '';
+        // Refresh the page data to show updated quiz name
+        await update();
+      }
+    };
+  }
+  
   function formatDate(dateInput: string | Date) {
     const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
     return date.toLocaleDateString('en-US', {
@@ -210,7 +222,7 @@
               </td>
               <td class="topic-cell">
                 {#if editingQuiz === quiz.id}
-                  <form method="POST" action="?/editQuizTopic" use:enhance class="edit-form">
+                  <form method="POST" action="?/editQuizTopic" use:enhance={handleEditSubmit} class="edit-form">
                     <input type="hidden" name="quizId" value={quiz.id} />
                     <input 
                       type="text" 
