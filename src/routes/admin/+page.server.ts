@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { fail, redirect } from "@sveltejs/kit";
+import { fail } from "@sveltejs/kit";
 import { db } from "$lib/server/db";
 import { questions, quizAttempts, quizzes } from "$lib/server/db/schema";
 import { count, desc, eq, sql } from "drizzle-orm";

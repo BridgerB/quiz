@@ -125,15 +125,16 @@ export const actions: Actions = {
     }
   },
 
-  clearCache: async () => {
+  clearCache: () => {
     try {
       // In a real app, you'd clear Redis cache, file cache, etc.
       // For now, we'll just simulate it
-      if (global.gc) {
-        global.gc();
+      if ((globalThis).gc) {
+        (globalThis).gc();
       }
       return { success: true, message: "Cache cleared successfully" };
     } catch (error) {
+      console.error("Error clearing cache:", error);
       return fail(500, { error: "Failed to clear cache" });
     }
   },
@@ -167,12 +168,13 @@ export const actions: Actions = {
     }
   },
 
-  runMigration: async () => {
+  runMigration: () => {
     try {
       // Simulate running database migrations
       // In a real app, you'd run actual migration scripts
       return { success: true, message: "Database migrations completed" };
     } catch (error) {
+      console.error("Error running migrations:", error);
       return fail(500, { error: "Migration failed" });
     }
   }

@@ -80,7 +80,7 @@
         <div class="status-details">
           {#if data.dbHealth.status === 'connected'}
             <p>Connected successfully</p>
-            <small>Last check: {formatDate(data.dbHealth.timestamp)}</small>
+            <small>Last check: {formatDate(data.dbHealth.timestamp || new Date().toISOString())}</small>
           {:else}
             <p>Connection error</p>
             <small class="error-text">{data.dbHealth.error}</small>
@@ -328,7 +328,7 @@
     border: 1px solid #e1e5e9;
   }
 
-  .status-section h2, .db-section h2, .tools-section h2, .activity-section h2, .links-section h2, .env-section h2 {
+  .status-section h2, .db-section h2, .tools-section h2, .links-section h2, .env-section h2 {
     color: #333;
     margin-top: 0;
     margin-bottom: 1.5rem;

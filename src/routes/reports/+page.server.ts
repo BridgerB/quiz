@@ -74,7 +74,10 @@ export const load: PageServerLoad = async () => {
       .orderBy(sql`DATE(${quizAttempts.completedAt})`);
 
     // Group by date in JavaScript
-    const dailyData: Record<string, { count: number; totalScore: number; attempts: number[] }> = {};
+    const dailyData: Record<
+      string,
+      { count: number; totalScore: number; attempts: number[] }
+    > = {};
     dailyAttemptsRaw.forEach((attempt) => {
       const date = attempt.date;
       if (!dailyData[date]) {
@@ -90,7 +93,8 @@ export const load: PageServerLoad = async () => {
       date,
       count: data.count,
       avgScore: data.attempts.length > 0
-        ? data.attempts.reduce((a: number, b: number) => a + b, 0) / data.attempts.length
+        ? data.attempts.reduce((a: number, b: number) => a + b, 0) /
+          data.attempts.length
         : 0,
     })).sort((a, b) => a.date.localeCompare(b.date));
 
