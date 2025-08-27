@@ -1,7 +1,10 @@
 <script>
+	import { enhance } from '$app/forms';
+	
 	export let form;
 	
 	let topic = form?.topic || '';
+	let isSubmitting = false;
 </script>
 
 <div class="container">
@@ -15,6 +18,13 @@
 			method="POST" 
 			action="?/create"
 			class="create-form"
+			use:enhance={() => {
+				isSubmitting = true;
+				return async ({ update }) => {
+					isSubmitting = false;
+					update();
+				};
+			}}
 		>
 			<div class="form-group">
 				<label for="topic" class="form-label">
@@ -31,6 +41,7 @@
 					maxlength="100"
 					class="form-input"
 					class:error={form?.error}
+					disabled={isSubmitting}
 				/>
 				<div class="form-help">
 					Enter any topic you'd like to create a quiz about. The AI will generate 5 multiple-choice questions.
@@ -47,10 +58,15 @@
 			<div class="form-actions">
 				<button 
 					type="submit" 
-					disabled={!topic.trim()}
+					disabled={!topic.trim() || isSubmitting}
 					class="create-button"
 				>
-					Create Quiz
+					{#if isSubmitting}
+						<span class="loading-spinner"></span>
+						Generating Quiz...
+					{:else}
+						Create Quiz
+					{/if}
 				</button>
 				
 				<a href="/" class="cancel-button">Cancel</a>
@@ -325,6 +341,22 @@
 	.tech-info li {
 		margin-bottom: 0.5rem;
 		line-height: 1.4;
+	}
+
+	.loading-spinner {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border: 2px solid rgba(255, 255, 255, 0.3);
+		border-radius: 50%;
+		border-top-color: white;
+		animation: spin 0.8s linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	@media (max-width: 768px) {
