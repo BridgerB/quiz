@@ -67,12 +67,10 @@
 </script>
 
 <div class="container">
-	<header class="header">
-		<a href="/" class="home-link">
-			<h1>Quiz Builder</h1>
-		</a>
+	<div class="page-header">
+		<div class="page-header-spacer"></div>
 		<a href="/create" class="create-btn">Create +</a>
-	</header>
+	</div>
 
 	<div class="search-section">
 		<div class="search-input-group">
@@ -144,27 +142,15 @@
 		font-family: system-ui, sans-serif;
 	}
 
-	.header {
+	.page-header {
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-end;
 		align-items: center;
-		margin-bottom: 2rem;
+		margin-bottom: 1.5rem;
 	}
 
-	.home-link {
-		text-decoration: none;
-		color: inherit;
-	}
-	
-	.home-link:hover {
-		opacity: 0.8;
-	}
-
-	.header h1 {
-		color: #333;
-		font-size: 2rem;
-		font-weight: 600;
-		margin: 0;
+	.page-header-spacer {
+		flex: 1;
 	}
 
 	.create-btn {
@@ -356,16 +342,6 @@
 	@media (max-width: 768px) {
 		.container {
 			padding: 1rem;
-		}
-		
-		.header {
-			flex-direction: column;
-			gap: 1rem;
-			align-items: stretch;
-		}
-		
-		.create-btn {
-			text-align: center;
 		}
 		
 		.quiz-grid {
