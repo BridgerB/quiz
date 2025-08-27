@@ -111,15 +111,6 @@ export const load: PageServerLoad = async () => {
       ) / allAttempts.length
       : 0;
 
-    console.log("📊 Database query results:");
-    console.log("Total quizzes:", totalQuizzes);
-    console.log("Total attempts:", totalAttempts);
-    console.log("Average score:", avgScore);
-    console.log("Quiz trends:", quizTrends);
-    console.log("Score distribution:", scoreDistribution);
-    console.log("Popular topics:", popularTopics);
-    console.log("Daily attempts:", dailyAttempts);
-
     // If no attempts exist, provide sample data for better UX
     const hasAttempts = totalAttempts[0]?.count > 0;
 
@@ -152,7 +143,6 @@ export const load: PageServerLoad = async () => {
       },
     };
   } catch (error) {
-    console.error("Error loading reports data:", error);
     return {
       stats: {
         totalQuizzes: 0,
