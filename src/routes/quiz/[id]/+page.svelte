@@ -6,13 +6,9 @@
 	
 	let currentQuestionIndex = 0;
 	let userAnswers = {};
-	let showResults = false;
-	let isSubmitting = false;
-	
 	$: currentQuestion = data.questions[currentQuestionIndex];
 	$: isLastQuestion = currentQuestionIndex === data.questions.length - 1;
 	$: totalQuestions = data.questions.length;
-	$: answeredCurrentQuestion = userAnswers[currentQuestion?.id] !== undefined;
 	
 	function selectAnswer(questionId, answer) {
 		userAnswers[questionId] = answer;
@@ -30,21 +26,10 @@
 			currentQuestionIndex--;
 		}
 	}
-	
-	function submitQuiz() {
-		isSubmitting = true;
-	}
-	
-	// Show results if form submission was successful
-	$: if (form?.success) {
-		showResults = true;
-		isSubmitting = false;
-	}
 </script>
 
 <div class="container">
-	{#if !showResults}
-		<!-- Quiz Taking Interface -->
+	<!-- Quiz Taking Interface -->
 		<div class="quiz-header">
 			<h1>Quiz: {data.quiz.topic}</h1>
 			<div class="progress-bar">
@@ -103,15 +88,6 @@
 					<form 
 						method="POST" 
 						action="?/submit"
-						use:enhance={() => {
-							submitQuiz();
-							return async ({ result }) => {
-								if (result.type === 'success') {
-									showResults = true;
-								}
-								isSubmitting = false;
-							};
-						}}
 					>
 						<!-- Hidden inputs for all answers -->
 						{#each data.questions as question}
@@ -122,75 +98,14 @@
 						
 						<button 
 							type="submit" 
-							disabled={isSubmitting}
 							class="nav-btn submit"
 						>
-							{#if isSubmitting}
-								Submitting...
-							{:else}
-								Submit Quiz
-							{/if}
+							Submit Quiz
 						</button>
 					</form>
 				{/if}
 			</div>
 		</div>
-
-	{:else}
-		<!-- Results Display -->
-		<div class="results-container">
-			<div class="results-header">
-				<h1>Quiz Results</h1>
-				<div class="score-display">
-					<div class="score-circle">
-						<span class="score-text">{form.score}/{form.totalQuestions}</span>
-					</div>
-					<div class="score-percentage">
-						{Math.round((form.score / form.totalQuestions) * 100)}%
-					</div>
-				</div>
-			</div>
-
-			<div class="results-summary">
-				<h2>Answer Review</h2>
-				{#each form.results as result, index}
-					<div class="result-item" class:correct={result.isCorrect} class:incorrect={!result.isCorrect}>
-						<div class="result-header">
-							<span class="question-number">Question {index + 1}</span>
-							<span class="result-badge" class:correct={result.isCorrect} class:incorrect={!result.isCorrect}>
-								{result.isCorrect ? '✓ Correct' : '✗ Incorrect'}
-							</span>
-						</div>
-						
-						<h3 class="result-question">{result.questionText}</h3>
-						
-						<div class="result-answers">
-							<div class="answer-row">
-								<span class="answer-label">Your Answer:</span>
-								<span class="answer-value" class:correct={result.isCorrect} class:incorrect={!result.isCorrect}>
-									{result.userAnswer === 'Not answered' ? result.userAnswer : `${result.userAnswer}. ${result.options[result.userAnswer] || 'Invalid answer'}`}
-								</span>
-							</div>
-							
-							{#if !result.isCorrect}
-								<div class="answer-row">
-									<span class="answer-label">Correct Answer:</span>
-									<span class="answer-value correct">
-										{result.correctAnswer}. {result.options[result.correctAnswer]}
-									</span>
-								</div>
-							{/if}
-						</div>
-					</div>
-				{/each}
-			</div>
-
-			<div class="results-actions">
-				<a href="/" class="action-btn secondary">Back to Home</a>
-				<a href="/create" class="action-btn primary">Create Another Quiz</a>
-			</div>
-		</div>
-	{/if}
 </div>
 
 <style>
