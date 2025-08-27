@@ -1,6 +1,7 @@
 import type { Actions } from "@sveltejs/kit";
+import { fail } from "@sveltejs/kit";
 import { db } from "$lib/server/db";
-import { questions, quizzes } from "$lib/server/db/schema";
+import { questions, quizAttempts, quizzes } from "$lib/server/db/schema";
 import { desc, eq, or } from "drizzle-orm";
 
 export const load = async ({ url }: { url: URL }) => {
@@ -60,5 +61,26 @@ export const actions: Actions = {
       success: true,
       searchTerm,
     };
+  },
+
+  deleteQuiz: async ({ request }) => {
+    const data = await request.formData();
+    const quizId = data.get("quizId")?.toString();
+
+    if (!quizId) {
+      return fail(400, { error: "Quiz ID is required" });
+    }
+
+    try {
+      // Delete in order: attempts, questions, quiz
+      await db.delete(quizAttempts).where(eq(quizAttempts.quizId, quizId));
+      await db.delete(questions).where(eq(questions.quizId, quizId));
+      await db.delete(quizzes).where(eq(quizzes.id, quizId));
+
+      return { success: true, message: "Quiz deleted successfully" };
+    } catch (error) {
+      console.error("Error deleting quiz:", error);
+      return fail(500, { error: "Failed to delete quiz" });
+    }
   },
 };

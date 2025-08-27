@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
+	import { enhance } from '$app/forms';
 	
 	interface Question {
 		id: string;
@@ -26,6 +27,7 @@
 	}
 	
 	export let data: PageData;
+	export let form: any;
 
 	let searchValue = data.searchQuery || '';
 	let filteredQuizzes = data.quizzes || [];
@@ -86,6 +88,10 @@
 		});
 	}
 	
+	function confirmDelete(quizTopic: string) {
+		return confirm(`Are you sure you want to delete the quiz "${quizTopic}"? This action cannot be undone.`);
+	}
+	
 	// Initialize filtered quizzes when data loads
 	$: filteredQuizzes = filterQuizzes(searchValue, data.quizzes);
 </script>
@@ -95,6 +101,19 @@
 		<div class="page-header-spacer"></div>
 		<a href="/create" class="create-btn">Create +</a>
 	</div>
+
+	<!-- Success/Error Messages -->
+	{#if form?.success}
+		<div class="alert success">
+			✅ {form.message}
+		</div>
+	{/if}
+	
+	{#if form?.error}
+		<div class="alert error">
+			❌ {form.error}
+		</div>
+	{/if}
 
 	<div class="search-section">
 		<div class="search-input-group">
@@ -135,7 +154,17 @@
 						
 						<div class="quiz-card-footer">
 							<a href="/quiz/{quiz.id}" class="take-quiz-btn">Take Quiz</a>
-							<button class="quiz-menu-btn" title="More options">⋮</button>
+							<form method="POST" action="?/deleteQuiz" use:enhance class="delete-form">
+								<input type="hidden" name="quizId" value={quiz.id} />
+								<button 
+									type="submit" 
+									class="delete-btn" 
+									title="Delete quiz"
+									on:click={(e) => { if (!confirmDelete(quiz.topic)) e.preventDefault(); }}
+								>
+									🗑️
+								</button>
+							</form>
 						</div>
 					</div>
 				{/each}
@@ -189,6 +218,25 @@
 
 	.create-btn:hover {
 		background: #0056b3;
+	}
+
+	.alert {
+		padding: 1rem;
+		border-radius: 8px;
+		margin-bottom: 2rem;
+		font-weight: 500;
+	}
+
+	.alert.success {
+		background: #d4edda;
+		color: #155724;
+		border: 1px solid #c3e6cb;
+	}
+
+	.alert.error {
+		background: #f8d7da;
+		color: #721c24;
+		border: 1px solid #f5c6cb;
 	}
 
 	.search-section {
@@ -308,19 +356,25 @@
 		background: #1e7e34;
 	}
 
-	.quiz-menu-btn {
+	.delete-form {
+		display: inline;
+	}
+
+	.delete-btn {
 		background: none;
 		border: none;
-		color: #666;
+		color: #dc3545;
 		cursor: pointer;
 		padding: 0.5rem;
 		border-radius: 4px;
-		font-size: 1.2rem;
+		font-size: 1.1rem;
 		line-height: 1;
+		transition: all 0.2s ease;
 	}
 
-	.quiz-menu-btn:hover {
+	.delete-btn:hover {
 		background: #f8f9fa;
+		transform: scale(1.1);
 	}
 
 	.empty-state {
