@@ -2,6 +2,16 @@
 	export let data;
 	
 	$: scorePercentage = Math.round((data.attempt.score / data.attempt.totalQuestions) * 100);
+	
+	function getCorrectOptionText(question) {
+		switch (question.correctAnswer) {
+			case 'A': return question.optionA;
+			case 'B': return question.optionB;
+			case 'C': return question.optionC;
+			case 'D': return question.optionD;
+			default: return 'Unknown';
+		}
+	}
 </script>
 
 <div class="container">
@@ -57,7 +67,27 @@
 				{#each data.questions as question, index}
 					<div class="question-preview">
 						<div class="question-number">{index + 1}</div>
-						<div class="question-text">{question.questionText}</div>
+						<div class="question-content">
+							<div class="question-text">{question.questionText}</div>
+							<div class="answer-options">
+								<div class="option" class:correct={question.correctAnswer === 'A'}>
+									<span class="option-letter">A:</span> {question.optionA}
+								</div>
+								<div class="option" class:correct={question.correctAnswer === 'B'}>
+									<span class="option-letter">B:</span> {question.optionB}
+								</div>
+								<div class="option" class:correct={question.correctAnswer === 'C'}>
+									<span class="option-letter">C:</span> {question.optionC}
+								</div>
+								<div class="option" class:correct={question.correctAnswer === 'D'}>
+									<span class="option-letter">D:</span> {question.optionD}
+								</div>
+							</div>
+							<div class="correct-answer">
+								<span class="correct-label">Correct Answer:</span> 
+								<span class="correct-text">{question.correctAnswer}: {getCorrectOptionText(question)}</span>
+							</div>
+						</div>
 					</div>
 				{/each}
 			</div>
@@ -240,10 +270,58 @@
 		flex-shrink: 0;
 	}
 
+	.question-content {
+		flex: 1;
+	}
+
 	.question-text {
 		color: #333;
 		line-height: 1.4;
-		flex: 1;
+		font-weight: 600;
+		margin-bottom: 1rem;
+	}
+
+	.answer-options {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.option {
+		padding: 0.5rem;
+		background: #fff;
+		border: 1px solid #e1e5e9;
+		border-radius: 6px;
+		font-size: 0.9rem;
+	}
+
+	.option.correct {
+		background: #d4edda;
+		border-color: #28a745;
+		color: #155724;
+	}
+
+	.option-letter {
+		font-weight: 600;
+		margin-right: 0.5rem;
+	}
+
+	.correct-answer {
+		padding: 0.75rem;
+		background: #f8f9fa;
+		border-radius: 6px;
+		border-left: 3px solid #28a745;
+	}
+
+	.correct-label {
+		font-weight: 600;
+		color: #28a745;
+	}
+
+	.correct-text {
+		font-weight: 500;
+		color: #333;
 	}
 
 	.actions {
