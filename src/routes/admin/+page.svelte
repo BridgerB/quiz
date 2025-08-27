@@ -272,13 +272,13 @@
     <h2>Recent Quiz Attempts</h2>
     <div class="activity-list">
       {#each data.recentAttempts as attempt (attempt.id)}
-        <div class="activity-item">
+        <a href="/quiz/results/{attempt.id}" class="activity-item activity-link">
           <div class="activity-content">
             <span class="activity-quiz">📝 {attempt.quizTopic}</span>
             <span class="activity-score">{formatScore(attempt.score, attempt.totalQuestions)}</span>
           </div>
           <div class="activity-time">{formatDate(attempt.completedAt)}</div>
-        </div>
+        </a>
       {/each}
       
       {#if data.recentAttempts.length === 0}
@@ -583,6 +583,18 @@
     background: #f8f9fa;
     border-radius: 8px;
     border-left: 4px solid #007bff;
+  }
+
+  .activity-link {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+  }
+
+  .activity-link:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .activity-content {
